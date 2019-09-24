@@ -1,0 +1,26 @@
+node_modules
+npm-debug.log
+package-lock.json
+
+yarn-error.log
+.env
+
+.DS_Store
+
+
+### IDE Settings (EditorConfig/Sublime)
+.editorconfig
+
+### IDE Settings (VSCode)
+.vscode
+
+
+public
+temp*
+
+
+# test file
+test.js
+
+BETA
+PKG.json
