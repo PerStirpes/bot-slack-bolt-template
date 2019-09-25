@@ -1,13 +1,26 @@
-import { App, LogLevel, directMention } from '@slack/bolt';
+import {
+  App,
+  ButtonAction,
+  BlockAction,
+  LogLevel,
+  RespondArguments,
+  SlackActionMiddlewareArgs,
+  directMention,
+  BlockButtonAction,
+  Middleware,
+} from '@slack/bolt';
+import { ErrorCode } from '@slack/web-api';
+// WebAPICallResult
 import * as WebApi from 'seratch-slack-types/web-api';
 
 const app: App = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  logLevel: LogLevel.INFO,
+  logLevel: LogLevel.DEBUG,
 });
 
-import { ErrorCode } from '@slack/web-api';
+// import * as Backend from 'seratch-slack-typesapp/';
+// import { Action } from 'seratch-slack-types/web-api/ChannelsHistoryResponse';
 
 type SlackError = {
   code: string;
@@ -37,9 +50,10 @@ function errorDescription(error: SlackError): void {
 
 ###############################################################
 */
-
-app.action('button_click', ({ action, ack, body, say }) => {
+//
+app.action('button_click', ({ action, ack, context, body, say }) => {
   ack();
+
   say(`<@${body.user.id}> clicked the ${action.type}`);
 });
 
@@ -51,35 +65,110 @@ app.action('action_taken', ({ action, ack, body, say }) => {
   say(`<@${body.user.id}> clicked the  ${action.type}`);
 });
 
-// The middleware will be called every time an interactive component with the action_id “escalate_yes" is triggered
-app.action('escalate_yes', async ({ context, action, ack, say }) => {
-  console.log(action);
+interface Context extends BlockAction {
+  context?: any;
+}
+// const votesBlock : ContextBlock = {
+// 	type: "context",
+// 	elements: []
+// }
 
-  // Acknowledge action request
+// The middleware will be called every time an interactive component with the action_id “escalate_yes" is triggered
+// app.action(
+//   'escalate_button',
+//   async ({
+//     ack,
+//     action,
+//     body,
+//     context,
+//     payload,
+//     respond,
+//   }: SlackActionMiddlewareArgs<BlockAction<ButtonAction>>): Promise<void> => {
+//     // const context: Context = context as Context;
+
+//     //   const { context, action, body, payload, ack } = event;
+//     //   const { value } = payload;
+//     //   console.log('TCL: event', event);
+//     // async ({
+//     // 	ack,
+//     // 	action,
+//     // 	body,
+//     //  context: object,
+//     // 	payload,
+//     // 	respond,
+//     //   }
+//     console.log('TCL: body', body);
+//     console.log('TCL: action', JSON.stringify(action.value));
+//     // const buttonAction: ButtonAction = action as ButtonAction;
+//     ack();
+
+//     const actionData = JSON.parse(payload.value);
+
+//     // Call the chat.getPermalink method with a token
+//     let result: any;
+//     try {
+//       result = await app.client.chat.getPermalink({
+//         // The token you used to initialize your app is stored in the `context` object
+//         //   token: context.botToken,
+//         channel: actionData.channel,
+//         message_ts: actionData.ts,
+//       });
+//       console.log('TCL: result', result.permalink);
+//     } catch (error) {
+//       errorDescription(error);
+//     }
+//     // say() method only posts a message to the same channel, so you need to call the method
+//     try {
+//       result;
+//       const post = await app.client.chat.postMessage({
+//         // The token you used to initialize your app is stored in the `context` object
+//         //   token: context.botToken,
+//         channel: 'CMPLZD6S3',
+//         text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
+//         unfurl_links: true,
+//       });
+//       console.log('TCL: post', post);
+//     } catch (error) {
+//       errorDescription(error);
+//     }
+//   },
+// );
+app.action('escalate_button', async ({ ack, action, context }) => {
   ack();
 
-  const actionData = JSON.parse(action.type);
+  const buttonAction: ButtonAction = action as ButtonAction;
+
+  ack();
+
+  const actionData = JSON.parse(buttonAction.value);
 
   // Call the chat.getPermalink method with a token
-
-  const result = await app.client.chat.getPermalink({
-    // The token you used to initialize your app is stored in the `context` object
-    token: context.botToken,
-    channel: actionData.channel,
-    message_ts: actionData.ts,
-  });
-
-  console.log(result.permalink);
-
+  let result: any;
+  try {
+    result = await app.client.chat.getPermalink({
+      // The token you used to initialize your app is stored in the `context` object
+      token: context.botToken,
+      channel: actionData.channel,
+      message_ts: actionData.ts,
+    });
+    console.log('TCL: result', result.permalink);
+  } catch (error) {
+    errorDescription(error);
+  }
   // say() method only posts a message to the same channel, so you need to call the method
-
-  const post = await app.client.chat.postMessage({
-    // The token you used to initialize your app is stored in the `context` object
-    token: context.botToken,
-    channel: 'CMPLZD6S3',
-    text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
-    unfurl_links: true,
-  });
+  try {
+    result;
+    const post = await app.client.chat.postMessage({
+      // The token you used to initialize your app is stored in the `context` object
+      token: context.botToken,
+      channel: 'CMPLZD6S3',
+      text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
+      unfurl_links: true,
+    });
+    console.log('TCL: post', post);
+  } catch (error) {
+    errorDescription(error);
+  }
 });
 
 /*
@@ -238,7 +327,8 @@ app.message('sleep it off', directMention(), async ({ context, say }) => {
 });
 
 app.message('Palmeiras game', async ({ message, say }) => {
-  console.log(message);
+  console.log('TCL: message', message);
+
   const { channel, ts, user } = message;
 
   const message_blocks = [
@@ -277,7 +367,8 @@ app.message('Palmeiras game', async ({ message, say }) => {
 
 // *** Responding a message containing a red circle emoji ***
 app.message(':red_circle:', async ({ message, say }) => {
-  console.log(message);
+  console.log('TCL: message', message);
+
   const { channel, ts, user } = message;
 
   const message_blocks = [
@@ -294,7 +385,7 @@ app.message(':red_circle:', async ({ message, say }) => {
           text: 'HELL YES',
         },
         value: JSON.stringify({ ts: ts, channel: channel, user: user }),
-        action_id: 'escalate_yes',
+        action_id: 'escalate_button',
       },
     },
   ];
@@ -316,11 +407,14 @@ app.message(':red_circle:', async ({ message, say }) => {
 ###############################################################
 */
 
-app.command('/echo', async ({ command, ack, say }) => {
-  // Acknowledge command request
-  ack();
-  say(`You said "${command.text}"`);
-});
+app.command(
+  '/echo',
+  async ({ command, ack, say }): Promise<void> => {
+    // Acknowledge command request
+    ack();
+    say(`You said "${command.text}"`);
+  },
+);
 
 /*
 ###############################################################
