@@ -14,9 +14,11 @@
 
 #### change the URL based on environmnet
 
+TODO: _research how to setup_
+
 ```js
-if (process.env.NODE_ENV === "test") {
-  console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
-  // options.slackApiUrl = 'http://localhost:8888/api/';
+if (process.env.NODE_ENV !== "production") {
+	console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
+	// options.slackApiUrl = 'http://localhost:8888/api/';
 }
 ```
