@@ -6,7 +6,7 @@
   "description": "template-bolt-app",
   "main": "src/app.ts",
   "engines": {
-    "node": "^10.12.0"
+    "node": "^10.16.3"
   },
   "scripts": {
     "start": "yarn build:live",
