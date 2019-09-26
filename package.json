@@ -13,7 +13,6 @@
     "build": "tsc -p .",
     "build:live": "nodemon --watch 'src/*.ts' --exec 'ts-node' src/app.ts",
     "lint": "eslint \"src/**\"",
-    "precommit": "npm run prettier:write",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "npm run prettier:base -- --list-different \"src/**/*.{ts}\"",
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts}\"",
@@ -44,7 +43,7 @@
   },
   "lint-staged": {
     "*.{ts}": [
-      "prettier --write --single-quote --print-width 100 --arrow-parens always --trailing-comma es5",
+      "prettier --write --single-quote --print-width 120 --arrow-parens always --trailing-comma es5",
       "eslint --fix",
       "git add"
     ]
