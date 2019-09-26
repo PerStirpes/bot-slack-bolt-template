@@ -45,7 +45,7 @@
   "lint-staged": {
     "*.{ts}": [
       "prettier --write --single-quote --print-width 120 --arrow-parens always --trailing-comma es5",
-      "eslint --fix",
+      "yarn lint --fix",
       "git add"
     ]
   },
