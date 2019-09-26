@@ -9,9 +9,9 @@
     "node": "^10.16.3"
   },
   "scripts": {
-    "start": "yarn build:live",
+    "start": "concurrently \"yarn build:live\" \"ngrok http -subdomain=chocolatemilk 3000\"",
     "build": "tsc -p .",
-    "build:live": "nodemon --watch 'src/*.ts' --exec 'ts-node' src/app.ts",
+    "build:live": "nodemon -r dotenv/config -w 'src/*.ts' --exec 'ts-node' src/app.ts",
     "lint": "eslint \"src/**\"",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "yarn prettier:base -- --list-different \"src/**/*.{ts}\"",
@@ -28,6 +28,8 @@
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "2.3.1",
     "@typescript-eslint/parser": "2.3.1",
+    "concurrently": "4.1.2",
+    "dotenv": "8.1.0",
     "eslint": "6.4.0",
     "lint-staged": "^9.3.0",
     "querystring": "0.2.0",
