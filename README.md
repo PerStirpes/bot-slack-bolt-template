@@ -1,5 +1,9 @@
 # Bolt Slack App template
 
+
+My personal starter that I use to spin up slack apps. The updates are still on a branch on my local machine that I need to push.
+
+
 #### ngrok tunnel command
 
 `ngrok http -subdomain=chocolatemilk 3000`
