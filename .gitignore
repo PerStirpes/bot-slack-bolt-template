@@ -1,26 +1,25 @@
-node_modules
-npm-debug.log
-package-lock.json
-
-yarn-error.log
-.env
-
-.DS_Store
-
-
 ### IDE Settings (EditorConfig/Sublime)
 .editorconfig
 
 ### IDE Settings (VSCode)
 .vscode
 
+### logs
+yarn-error.log
+npm-debug.log
 
+### dot files
+.env
+.DS_Store
+
+### builds
+dist
 public
 temp*
 
 
-# test file
+### test file
 test.js
 
-BETA
-PKG.json
+node_modules
+package-lock.json

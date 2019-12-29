@@ -1,3 +1,4 @@
+
 import {
   App,
   ButtonAction,
@@ -18,13 +19,20 @@ import { getMessages, getChannel, getMe, setChannel, setMe } from './store';
 import { copy, getUrlWithParams } from './helpers';
 import { messages } from './messages';
 import { StringIndexed } from '@slack/bolt/dist/types/helpers';
+import { App, LogLevel } from "@slack/bolt";
+import * as WebApi from "seratch-slack-types/web-api";
+import { errorDescription } from "./utils";
+import { asCodedError } from "@slack/bolt/dist/errors";
+
 
 const app: App = new App({
   authorize: () => {
     return Promise.resolve({
+
       botId: '<Add Your BOT ID>',
       botToken: process.env.SLACK_BOT_TOKEN,
       userToken: process.env.SLACK_USER_TOKEN,
+
     });
   },
 
@@ -224,8 +232,6 @@ app.action('incident_ack', async ({ action, body, ack, say, context }) => {
   incidentOpenMessage = undefined;
 });
 
-/*
-################################################################
 
 
 ########################### MESSAGES ########################### 
@@ -236,6 +242,7 @@ app.action('incident_ack', async ({ action, body, ack, say, context }) => {
 
 // const response = await web.users.info({ user: "..." });
 app.message('happy', async ({ message, context }) => {
+
   try {
     const result = await app.client.reactions.add({
       token: context.botToken,
@@ -255,7 +262,10 @@ app.message('happy', async ({ message, context }) => {
   }
 });
 
-app.message('42', ({ message, context }) => {
+
+// Threads a message
+app.message('42', ({ message, context }): void => {
+
   // use chat.postMessage over say method
   try {
     const response = app.client.chat.postMessage({
@@ -270,7 +280,9 @@ app.message('42', ({ message, context }) => {
   }
 });
 
+// sends a button
 app.message('hello', ({ message, say }) => {
+  try {
   say({
     text: `Ewok is a dog!`,
     blocks: [
@@ -291,7 +303,12 @@ app.message('hello', ({ message, say }) => {
       },
     ],
   });
+  
+  } catch (error) {
+    errorDescription(error);
+  }
 });
+
 
 app.message('hi', async ({ message, say }) => {
   console.log(message);
@@ -499,11 +516,8 @@ app.message(({ message, say }) => {
 });
 
 /*
-###############################################################
-
 
 ########################### COMMANDS ########################### 
-
 
 ###############################################################
 */
@@ -602,7 +616,7 @@ app.event('app_mention', async ({ event, say, context }) => {
       }
     }
   } catch (reason) {
-    console.error(`Failed because ${reason}`);
+    errorDescription(reason);
   }
 });
 
@@ -830,22 +844,42 @@ app.event('reaction_added', ({ event, say }) => {
 ###############################################################
 */
 
-(async (PORT = 3000) => {
-  //TODO: Add type
-  try {
-    const server = await app.start(process.env.PORT || PORT);
-    console.log('⚡️ Bolt app is running!', PORT);
-  } catch (error) {
-    throw error;
-  }
 
-  console.log('Bolt is running');
-})();
+/*
 
-app.error(error => {
-  console.error(error);
+########################### Start App ########################### 
+
+*/
+
+if (process.env.NODE_ENV !== "production") {
+  (async (PORT = 3000) => {
+    try {
+      await app.start(process.env.PORT || PORT);
+    } catch (error) {
+      throw error;
+    }
+
+    console.log(
+      `> Template Bolt is running on PORT ${PORT} in ${process.env.NODE_ENV}`
+    );
+  })();
+}
+
+app.error(err => {
+  console.error("As Codeded Error", asCodedError(err));
 });
 
+
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV);
+
+process.on("uncaughtException", function(err) {
+  console.error(err.stack);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", function(reason, p) {
+  console.error("Unhandled rejection", reason);
+});
+
 
 export default app;
