@@ -16,8 +16,7 @@ A starter that I use to spin up slack apps. The updates are still on a branch on
    - The settings on all of the sub-pages under "Features" should be identical to the configuration of the [Slack staging app](https://api.slack.com/apps/<API_ID>) except for the following items. Ask a team member if you don't have access to view the staging app configuration.
    - All app URLs should be based from your ngrok-provided URL (e.g. `https://<ngrok-url>.ngrok.io/slack/events`) instead of the hosted staging app URL .
    - All slash commands should be namespaced in the form of `/slashcommand`.
-4.
-5. Copy `.env.template` in the root directory of this repository to `.env`. In this file you will provide your application with the configuration details we specified above. Follow the instructions in that file.
+4. Copy `.env.template` in the root directory of this repository to `.env`. In this file you will provide your application with the configuration details we specified above. Follow the instructions in that file.
 
 6. Run `yarn`
 
@@ -31,5 +30,7 @@ A starter that I use to spin up slack apps. The updates are still on a branch on
 Local changes should be picked up automatically without needing to restart the app.
 
 ##### Add secrets
+within the root directory
+`$ touch now.json`
 
-now secret add
+`$ now secret add <your-secret>`
