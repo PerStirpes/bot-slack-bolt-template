@@ -13,15 +13,16 @@ import {
   MessageEvent,
 } from '@slack/bolt';
 import { ErrorCode, ChatGetPermalinkArguments, WebAPICallResult } from '@slack/web-api';
-// addUser, getUser,
+
 import { getMessages, getChannel, getMe, setChannel, setMe } from './store';
 import { copy, getUrlWithParams } from './helpers';
 import { messages } from './messages';
 import { StringIndexed } from '@slack/bolt/dist/types/helpers';
+
 const app: App = new App({
   authorize: () => {
     return Promise.resolve({
-      botId: 'BNP5WM5LP',
+      botId: '<Add Your BOT ID>',
       botToken: process.env.SLACK_BOT_TOKEN,
       userToken: process.env.SLACK_USER_TOKEN,
     });
@@ -38,13 +39,11 @@ type SlackError = {
 
 function errorDescription(error: SlackError): void {
   if (error.code === ErrorCode.RequestError) {
-    // Some other error, oh no!
-    console.log('ErrorCode.RequestError ', error.data);
+    console.error('ErrorCode.RequestError ', error.data);
   } else if (error.code === ErrorCode.PlatformError) {
-    console.log('ErrorCode.PlatformError', error.data);
+    console.error('ErrorCode.PlatformError', error.data);
   } else if (error.code === ErrorCode.HTTPError) {
-    // Some other error, oh no!
-    console.log('ErrorCode.HTTPError ', error.data);
+    console.error('ErrorCode.HTTPError ', error.data);
   } else {
     console.error('Well that was unexpected! ', error);
   }
@@ -77,77 +76,80 @@ app.action('action_taken', ({ action, ack, body, say }) => {
 interface Context extends BlockAction {
   context?: any;
 }
-// const votesBlock : ContextBlock = {
-// 	type: "context",
-// 	elements: []
-// }
+
+const votesBlock : ContextBlock = {
+	type: "context",
+	elements: []
+}
 
 // The middleware will be called every time an interactive component with the action_id “escalate_yes" is triggered
-// app.action(
-//   'escalate_button',
-//   async ({
-//     ack,
-//     action,
-//     body,
-//     context,
-//     payload,
-//     respond,
-//   }: SlackActionMiddlewareArgs<BlockAction<ButtonAction>>): Promise<void> => {
-//     // const context: Context = context as Context;
+app.action(
+  'escalate_button',
+  async ({
+    ack,
+    action,
+    body,
+    context,
+    payload,
+    respond,
+  }: SlackActionMiddlewareArgs<BlockAction<ButtonAction>>): Promise<void> => {
 
-//     //   const { context, action, body, payload, ack } = event;
-//     //   const { value } = payload;
-//     //   console.log('TCL: event', event);
-//     // async ({
-//     // 	ack,
-//     // 	action,
-//     // 	body,
-//     //  context: object,
-//     // 	payload,
-//     // 	respond,
-//     //   }
-//     console.log('TCL: body', body);
-//     console.log('TCL: action', JSON.stringify(action.value));
-//     // const buttonAction: ButtonAction = action as ButtonAction;
-//     ack();
+  const context: Context = context as Context;
+  const { context, action, body, payload, ack } = event;
+  const { value } = payload;
+  
+  console.log('TCL: event', event);
+  
+async ({
+    	ack,
+    	action,
+    	body,
+     context: object,
+    	payload,
+    	respond,
+      }
+    console.log('TCL: body', body);
+    console.log('TCL: action', JSON.stringify(action.value));
+ 
+const buttonAction: ButtonAction = action as ButtonAction;
+    ack();
 
-//     const actionData = JSON.parse(payload.value);
+    const actionData = JSON.parse(payload.value);
 
 //     // Call the chat.getPermalink method with a token
-//     let result: any;
-//     try {
-//       result = await app.client.chat.getPermalink({
-//         // The token you used to initialize your app is stored in the `context` object
-//         //   token: context.botToken,
-//         channel: actionData.channel,
-//         message_ts: actionData.ts,
-//       });
-//       console.log('TCL: result', result.permalink);
-//     } catch (error) {
-//       errorDescription(error);
-//     }
-//     // say() method only posts a message to the same channel, so you need to call the method
-//     try {
-//       result;
-//       const post = await app.client.chat.postMessage({
-//         // The token you used to initialize your app is stored in the `context` object
-//         //   token: context.botToken,
-//         channel: 'CMPLZD6S3',
-//         text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
-//         unfurl_links: true,
-//       });
-//       console.log('TCL: post', post);
-//     } catch (error) {
-//       errorDescription(error);
-//     }
-//   },
-// );
+    let result: any;
+    try {
+      result = await app.client.chat.getPermalink({
+        // The token you used to initialize your app is stored in the `context` object
+        //   token: context.botToken,
+        channel: actionData.channel,
+        message_ts: actionData.ts,
+      });
+      console.log('TCL: result', result.permalink);
+    } catch (error) {
+      errorDescription(error);
+    }
+    // say() method only posts a message to the same channel, so you need to call the method
+    try {
+      result;
+      const post = await app.client.chat.postMessage({
+        // The token you used to initialize your app is stored in the `context` object
+        //   token: context.botToken,
+        channel: 'CMPLZD6S3',
+        text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
+        unfurl_links: true,
+      });
+      console.log('TCL: post', post);
+    } catch (error) {
+      errorDescription(error);
+    }
+  },
+);
+
 app.action('escalate_button', async ({ ack, action, context }) => {
   ack();
 
   const buttonAction: ButtonAction = action as ButtonAction;
-
-  ack();
 
   const actionData = JSON.parse(buttonAction.value);
 
@@ -164,6 +166,7 @@ app.action('escalate_button', async ({ ack, action, context }) => {
   } catch (error) {
     errorDescription(error);
   }
+  
   // say() method only posts a message to the same channel, so you need to call the method
   try {
     result;
@@ -324,7 +327,8 @@ app.message('knock knock', ({ message, say }) => {
   say(`_Who's there?_`);
 });
 
-/* Conversation context not loaded: Conversation not found
+/* Find out what's in the converstation context
+Conversation context not loaded: Conversation not found
 context 1 undefined
 //   console.log("context 0", context[0]);
 //   console.log("context 1", context[1]);
@@ -376,7 +380,7 @@ app.message('sleep it off', directMention(), async ({ context, say }) => {
   }
 });
 
-app.message('Palmeiras game', async ({ message, say }) => {
+app.message('game', async ({ message, say }) => {
   console.log('TCL: message', message);
 
   const { channel, ts, user } = message;
@@ -628,6 +632,7 @@ app.event('member_joined_channel', async ({ context, event, say }) => {
     say(message);
   }
 });
+
 interface ReactionAddedEvent {
   type: 'reaction_added';
   user: string;
@@ -762,60 +767,60 @@ app.event('reaction_added', async ({ event, context }) => {
   }
 });
 
-// app.event('reaction_added', async ({ event, say }) => {
-//   console.log(event);
-//   const said = say as SayFn;
+app.event('reaction_added', async ({ event, say }) => {
+  console.log(event);
+  const said = say as SayFn;
 
-//   say({ text: `:${event.reaction}:` });
-// });
+  say({ text: `:${event.reaction}:` });
+});
 
-// app.event('reaction_added', async ({ event, say }) => {
-//   // only react to a certain emoji. :frowning: for example
-//   if (event.reaction === 'frowning') {
-//     // const channelId = event.item.channel;
-//     // const ts = event.item.ts;
-//     const message_blocks = [
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'plain_text',
-//           text: 'This is a plain text section block.',
-//           emoji: true,
-//         },
-//       },
-//     ];
-//     // Respond to the message with a button
-//     say({
-//       text: 'This is a plain text section block.',
-//       blocks: message_blocks,
-//     });
-//   }
-// });
-// app.event('reaction_added', ({ event, say }) => {
-//   if (event.reaction === 'calendar') {
-//     say({
-//       blocks: [
-//         {
-//           type: 'section',
-//           text: {
-//             type: 'mrkdwn',
-//             text: 'Pick a date for me to remind you',
-//           },
-//           accessory: {
-//             type: 'datepicker',
-//             action_id: 'datepicker_remind',
-//             initial_date: '2019-04-28',
-//             placeholder: {
-//               type: 'plain_text',
-//               text: 'Select a date',
-//             },
-//           },
-//         },
-//       ],
-//     });
-//   }
-// });
-/*
+app.event('reaction_added', async ({ event, say }) => {
+  // only react to a certain emoji. :frowning: for example
+  if (event.reaction === 'frowning') {
+    // const channelId = event.item.channel;
+    // const ts = event.item.ts;
+    const message_blocks = [
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: 'This is a plain text section block.',
+          emoji: true,
+        },
+      },
+    ];
+    // Respond to the message with a button
+    say({
+      text: 'This is a plain text section block.',
+      blocks: message_blocks,
+    });
+  }
+});
+app.event('reaction_added', ({ event, say }) => {
+  if (event.reaction === 'calendar') {
+    say({
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'Pick a date for me to remind you',
+          },
+          accessory: {
+            type: 'datepicker',
+            action_id: 'datepicker_remind',
+            initial_date: '2019-04-28',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+            },
+          },
+        },
+      ],
+    });
+  }
+});
+
 
 ###############################################################
 
