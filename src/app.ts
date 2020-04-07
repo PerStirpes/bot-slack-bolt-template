@@ -14,14 +14,10 @@ import {
   MessageEvent,
 } from '@slack/bolt';
 import { ErrorCode, ChatGetPermalinkArguments, WebAPICallResult } from '@slack/web-api';
-
 import { getMessages, getChannel, getMe, setChannel, setMe } from './store';
 import { copy, getUrlWithParams } from './helpers';
 import { messages } from './messages';
 import { StringIndexed } from '@slack/bolt/dist/types/helpers';
-import { App, LogLevel } from "@slack/bolt";
-import * as WebApi from "seratch-slack-types/web-api";
-import { errorDescription } from "./utils";
 import { asCodedError } from "@slack/bolt/dist/errors";
 
 
@@ -233,10 +229,8 @@ app.action('incident_ack', async ({ action, body, ack, say, context }) => {
 });
 
 
-
+/*
 ########################### MESSAGES ########################### 
-
-
 ################################################################
 */
 
@@ -265,7 +259,6 @@ app.message('happy', async ({ message, context }) => {
 
 // Threads a message
 app.message('42', ({ message, context }): void => {
-
   // use chat.postMessage over say method
   try {
     const response = app.client.chat.postMessage({
@@ -278,7 +271,7 @@ app.message('42', ({ message, context }): void => {
   } catch (reason) {
     console.error(`Failed because ${reason}`);
   }
-});
+})
 
 // sends a button
 app.message('hello', ({ message, say }) => {
@@ -347,8 +340,6 @@ app.message('knock knock', ({ message, say }) => {
 /* Find out what's in the converstation context
 Conversation context not loaded: Conversation not found
 context 1 undefined
-//   console.log("context 0", context[0]);
-//   console.log("context 1", context[1]);
 */
 
 app.message(/open the (.*) doors/i, ({ say, context }) => {
