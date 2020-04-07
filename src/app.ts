@@ -1,9 +1,10 @@
 import { App, ButtonAction, LogLevel, directMention, BlockButtonAction, MessageEvent } from '@slack/bolt'
-import { getMessages, getChannel, getMe, setChannel, setMe } from './store'
-import { copy, getUrlWithParams } from './helpers'
+import { asCodedError } from '@slack/bolt/dist/errors'
+import { UsersInfoResponse } from './types.s'
+import { getChannel, getMe } from './store'
 import { errorDescription } from './utils'
 import { messages } from './messages'
-import { asCodedError } from '@slack/bolt/dist/errors'
+import { copy } from './helpers'
 
 const app: App = new App({
   authorize: () => {
@@ -253,7 +254,7 @@ app.message(':red_circle:', async ({ message, say }) => {
 app.command(
   '/echo',
   async ({ command, ack, say }): Promise<void> => {
-    // Acknowledge command request
+    // * Acknowledge command request
     ack()
     say(`You said "${command.text}"`)
   },
@@ -264,65 +265,6 @@ app.command(
 ########################### EVENTS ########################### 
 ###############################################################
 */
-interface UsersInfoResponse {
-  ok?: boolean
-  user?: User
-  error?: string
-  needed?: string
-  provided?: string
-}
-
-interface User {
-  id?: string
-  team_id?: string
-  name?: string
-  deleted?: boolean
-  color?: string
-  real_name?: string
-  tz?: string
-  tz_label?: string
-  tz_offset?: number
-  profile?: Profile
-  is_admin?: boolean
-  is_owner?: boolean
-  is_primary_owner?: boolean
-  is_restricted?: boolean
-  is_ultra_restricted?: boolean
-  is_bot?: boolean
-  is_app_user?: boolean
-  updated?: number
-  has_2fa?: boolean
-}
-
-interface Profile {
-  title?: string
-  phone?: string
-  skype?: string
-  real_name?: string
-  real_name_normalized?: string
-  display_name?: string
-  display_name_normalized?: string
-  status_text?: string
-  status_emoji?: string
-  status_expiration?: number
-  avatar_hash?: string
-  bot_id?: string
-  api_app_id?: string
-  always_active?: boolean
-  image_original?: string
-  first_name?: string
-  last_name?: string
-  image_24?: string
-  image_32?: string
-  image_48?: string
-  image_72?: string
-  image_192?: string
-  image_512?: string
-  image_1024?: string
-  status_text_canonical?: string
-  team?: string
-  is_custom_image?: boolean
-}
 
 app.event('app_mention', async ({ event, say, context }) => {
   try {
@@ -343,7 +285,7 @@ app.event('app_mention', async ({ event, say, context }) => {
   }
 })
 
-app.event('member_joined_channel', async ({ context, event, say }) => {
+app.event('member_joined_channel', async ({ event, say }) => {
   const channel = getChannel()
   const user = event.user
 
@@ -357,66 +299,6 @@ app.event('member_joined_channel', async ({ context, event, say }) => {
     say(message)
   }
 })
-
-interface UsersInfoResponse {
-  ok?: boolean
-  user?: User
-  error?: string
-  needed?: string
-  provided?: string
-}
-
-interface User {
-  id?: string
-  team_id?: string
-  name?: string
-  deleted?: boolean
-  color?: string
-  real_name?: string
-  tz?: string
-  tz_label?: string
-  tz_offset?: number
-  profile?: Profile
-  is_admin?: boolean
-  is_owner?: boolean
-  is_primary_owner?: boolean
-  is_restricted?: boolean
-  is_ultra_restricted?: boolean
-  is_bot?: boolean
-  is_app_user?: boolean
-  updated?: number
-  has_2fa?: boolean
-}
-
-interface Profile {
-  title?: string
-  phone?: string
-  skype?: string
-  real_name?: string
-  real_name_normalized?: string
-  display_name?: string
-  display_name_normalized?: string
-  status_text?: string
-  status_emoji?: string
-  status_expiration?: number
-  avatar_hash?: string
-  bot_id?: string
-  api_app_id?: string
-  always_active?: boolean
-  image_original?: string
-  first_name?: string
-  last_name?: string
-  image_24?: string
-  image_32?: string
-  image_48?: string
-  image_72?: string
-  image_192?: string
-  image_512?: string
-  image_1024?: string
-  status_text_canonical?: string
-  team?: string
-  is_custom_image?: boolean
-}
 
 app.event('reaction_added', async ({ event, context }) => {
   // * only react to ⚡ (:zap:) emoji
@@ -454,7 +336,7 @@ app.event('reaction_added', async ({ event, context }) => {
   }
 })
 
-app.event('reaction_added', async ({ context, event, say }) => {
+app.event('reaction_added', async ({ event }) => {
   // * only react to a certain emoji. :frowning: for example
   if (event.reaction === 'frowning') {
     // * const channelId = event.item.channel;
@@ -492,9 +374,13 @@ if (process.env.NODE_ENV !== 'production') {
   })()
 }
 
-// app.error((error) => {
-//   console.error('As Codeded Error', asCodedError(error))
-// })
+app.error((error): any => {
+  try {
+    console.error('As Codeded Error', asCodedError(error))
+  } catch (error) {
+    throw `Something went wrong ${error}`
+  }
+})
 
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
 
