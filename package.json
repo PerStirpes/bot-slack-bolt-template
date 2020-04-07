@@ -1,48 +1,46 @@
 {
-  "name": "bolt",
-  "version": "1.0.0",
+  "name": "bolt-template",
+  "version": "2.0.0",
   "license": "MIT",
   "private": true,
   "description": "template-bolt-app",
   "main": "src/app.ts",
   "engines": {
-    "node": "^10.16.3"
+    "node": "^13.0.0"
   },
   "scripts": {
-    "start": "concurrently \"yarn build:live\" \"ngrok http -subdomain=chocolatemilk 3000\"",
+    "start": "yarn build:live",
     "build": "tsc -p .",
     "build:live": "nodemon -r dotenv/config -w 'src/*.ts' --exec 'ts-node' src/app.ts",
     "lint": "eslint \"src/**\"",
+    "ngrok": "ngrok http -subdomain=chocolatemilk 3000",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "yarn prettier:base -- --list-different \"src/**/*.{ts}\"",
     "prettier:write": "yarn prettier:base -- --write \"src/**/*.{ts}\"",
     "shame": "eslint tsconfig.json \"**/*.ts?(x)\""
   },
   "keywords": [],
-  "author": "Team LD",
+  "author": "Team",
   "dependencies": {
-    "@now/node": "latest",
-    "@slack/bolt": "^1.3.0",
-    "@slack/types": "latest",
-    "@types/eslint": "latest",
-    "@types/node": "latest",
-    "@typescript-eslint/eslint-plugin": "2.3.1",
-    "@typescript-eslint/parser": "2.3.1",
-    "concurrently": "4.1.2",
-    "dotenv": "8.1.0",
-    "eslint": "6.4.0",
-    "lint-staged": "^9.3.0",
+    "@slack/bolt": "^2.0.0",
+    "@slack/types": "^1.5.0",
+    "@types/eslint": "^6.8.0",
+    "@types/node": "^13.11.0",
+    "@typescript-eslint/eslint-plugin": "2.27.0",
+    "@typescript-eslint/parser": "2.27.0",
+    "dotenv": "8.2.0",
     "querystring": "0.2.0",
-    "seratch-slack-types": "^0.3.4",
-    "ts-node": "8.4.1",
-    "tslib": "^1.10.0",
-    "typescript": "3.6.3"
+    "ts-node": "8.8.2",
+    "tslib": "^1.11.1",
+    "typescript": "3.8.3"
   },
   "devDependencies": {
-    "@types/prettier": "1.18.2",
+    "@types/prettier": "2.0.0",
+    "eslint": "6.8.0",
     "husky": "3.0.5",
-    "nodemon": "1.19.2",
-    "prettier": "1.18.2"
+    "lint-staged": "^9.3.0",
+    "nodemon": "2.0.2",
+    "prettier": "2.0.4"
   },
   "lint-staged": {
     "*.{ts}": [
