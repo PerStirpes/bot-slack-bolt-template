@@ -1,23 +1,8 @@
-import {
-  App,
-  ButtonAction,
-  BlockAction,
-  LogLevel,
-  RespondArguments,
-  SlackActionMiddlewareArgs,
-  directMention,
-  BlockButtonAction,
-  Middleware,
-  SayFn,
-  SlackEventMiddlewareArgs,
-  MessageEvent,
-} from '@slack/bolt'
-import { ErrorCode, ChatGetPermalinkArguments, WebAPICallResult } from '@slack/web-api'
+import { App, ButtonAction, LogLevel, directMention, BlockButtonAction, MessageEvent } from '@slack/bolt'
 import { getMessages, getChannel, getMe, setChannel, setMe } from './store'
 import { copy, getUrlWithParams } from './helpers'
-import { messages } from './messages'
 import { errorDescription } from './utils'
-// import { StringIndexed } from '@slack/bolt/dist/types/helpers'
+import { messages } from './messages'
 import { asCodedError } from '@slack/bolt/dist/errors'
 
 const app: App = new App({
@@ -483,7 +468,7 @@ app.event('reaction_added', async ({ event, context }) => {
   }
 })
 
-app.event('reaction_added', async ({ event, say }) => {
+app.event('reaction_added', async ({ context, event, say }) => {
   // only react to a certain emoji. :frowning: for example
   if (event.reaction === 'frowning') {
     // const channelId = event.item.channel;
@@ -498,11 +483,11 @@ app.event('reaction_added', async ({ event, say }) => {
         },
       },
     ]
-    // Respond to the message with a button
     // say({
     //   text: 'This is a plain text section block.',
     //   blocks: message_blocks,
-    // });
+    // })
+    // Respond to the message with a button
   }
 })
 
