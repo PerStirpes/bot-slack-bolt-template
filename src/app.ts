@@ -13,7 +13,6 @@ const app: App = new App({
       userToken: process.env.SLACK_USER_TOKEN,
     })
   },
-
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   logLevel: LogLevel.DEBUG,
 })
@@ -25,31 +24,29 @@ app.action('escalate_button', async ({ ack, action, context }) => {
 
   const actionData = JSON.parse(buttonAction.value)
 
-  // Call the chat.getPermalink method with a token
+  // * Call the chat.getPermalink method with a token
   let result: any
   try {
     result = await app.client.chat.getPermalink({
-      // The token you used to initialize your app is stored in the `context` object
+      // * The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
       channel: actionData.channel,
       message_ts: actionData.ts,
     })
-    console.log('TCL: result', result.permalink)
   } catch (error) {
     errorDescription(error)
   }
 
-  // say() method only posts a message to the same channel, so you need to call the method
+  // * say() method only posts a message to the same channel, so you need to call the method
   try {
     result
     const post = await app.client.chat.postMessage({
-      // The token you used to initialize your app is stored in the `context` object
+      // * The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
-      channel: 'CMPLZD6S3',
+      channel: 'REPLACE_WITH_SLACK_CHANNEL',
       text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
       unfurl_links: true,
     })
-    console.log('TCL: post', post)
   } catch (error) {
     errorDescription(error)
   }
@@ -98,12 +95,11 @@ app.action('incident_ack', async ({ body, ack, say, context }) => {
   }
 })
 
-/*
+/* 
 ########################### MESSAGES ########################### 
 ################################################################
 */
 
-// const response = await web.users.info({ user: "..." });
 app.message('happy', async ({ message, context }) => {
   try {
     const result = await app.client.reactions.add({
@@ -118,14 +114,12 @@ app.message('happy', async ({ message, context }) => {
       channel: message.channel,
       timestamp: message.ts,
     })
-    console.log('reactions.add result & response:', result, response)
   } catch (error) {
     errorDescription(error)
   }
 })
 
 app.message('hi', async ({ message, say }) => {
-  console.log(message)
   const { channel, ts, user } = message
 
   const message_blocks = [
@@ -147,7 +141,7 @@ app.message('hi', async ({ message, say }) => {
     },
   ]
 
-  // Respond to the message with a button
+  // * Respond to the message with a button
   say({
     text: `Ewok is a dog!`,
     blocks: message_blocks,
@@ -155,10 +149,10 @@ app.message('hi', async ({ message, say }) => {
 })
 
 app.message('have a soda', directMention(), async ({ context, say }) => {
-  // Initialize conversation
+  // * Initialize conversation
   const conversation = context.conversation !== undefined ? context.conversation : {}
 
-  // Initialize data for this listener
+  // * Initialize data for this listener
   conversation.sodasHad = conversation.sodasHad !== undefined ? conversation.sodasHad : 0
 
   if (conversation.sodasHad > 4) {
@@ -185,8 +179,6 @@ app.message('sleep it off', directMention(), async ({ context, say }) => {
 })
 
 app.message('game', async ({ message, say }) => {
-  console.log('TCL: message', message)
-
   const { channel, ts, user } = message
 
   const message_blocks = [
@@ -216,17 +208,15 @@ app.message('game', async ({ message, say }) => {
     },
   ]
 
-  // Respond to the message with the next game
+  // * Respond to the message with the next game
   say({
     text: 'wats up?',
     blocks: message_blocks,
   })
 })
 
-// *** Responding a message containing a red circle emoji ***
+// * Responding a message containing a red circle emoji
 app.message(':red_circle:', async ({ message, say }) => {
-  console.log('TCL: message', message)
-
   const { channel, ts, user } = message
 
   const message_blocks = [
@@ -248,7 +238,7 @@ app.message(':red_circle:', async ({ message, say }) => {
     },
   ]
 
-  // Respond to the message with a button
+  // * Respond to the message with a button
   say({
     text: 'HELla YES',
     blocks: message_blocks,
@@ -335,7 +325,6 @@ interface Profile {
 }
 
 app.event('app_mention', async ({ event, say, context }) => {
-  console.log('event: ', event.user)
   try {
     const res: UsersInfoResponse = await app.client.users.info({
       token: context.botToken,
@@ -358,10 +347,10 @@ app.event('member_joined_channel', async ({ context, event, say }) => {
   const channel = getChannel()
   const user = event.user
 
-  // check if our Bot user itself is joining the channel
+  // * check if our Bot user itself is joining the channel
   if (user === getMe() && channel) {
     const message = copy(messages.welcome_channel)
-    // fill in placeholder values with channel info
+    // * fill in placeholder values with channel info
     message.blocks[0].text.text = message.blocks[0].text.text
       .replace('{{channelName}}', channel.name)
       .replace('{{channelId}}', channel.id)
@@ -430,32 +419,30 @@ interface Profile {
 }
 
 app.event('reaction_added', async ({ event, context }) => {
-  // only react to ⚡ (:zap:) emoji
-  // const events: ReactionAddedEvent = event as ReactionAddedPayload;
-  // let event: ReactionAddedEvent;'
+  // * only react to ⚡ (:zap:) emoji
+  // * const events: ReactionAddedEvent = event as ReactionAddedPayload;
+  // * let event: ReactionAddedEvent;'
 
   if (event.reaction === 'zap') {
     const { channel, ts } = event.item as MessageEvent
 
-    // get a permalink for this message
+    // * get a permalink for this message
     const permalink = await app.client.chat.getPermalink({
       token: context.botToken,
       message_ts: ts,
       channel: channel,
     })
 
-    // get user info of user who reacted to this message
+    // * get user info of user who reacted to this message
     const user: any = await app.client.users.info({
       token: context.botToken,
       user: event.user,
     })
 
-    //
-
     const name = '<@' + user.user.id + '>'
     const channelGot = getChannel()
 
-    // post this message to the configured channel
+    // * post this message to the configured channel
     await app.client.chat.postMessage({
       token: context.botToken,
       channel: channelGot && channelGot.id,
@@ -463,16 +450,15 @@ app.event('reaction_added', async ({ event, context }) => {
       unfurl_links: true,
       unfurl_media: true,
     })
-
-    // formatting the user's name to mention that user in the message (see: https://api.slack.com/messaging/composing/formatting)
+    // * formatting the user's name to mention that user in the message (see: https://api.slack.com/messaging/composing/formatting)
   }
 })
 
 app.event('reaction_added', async ({ context, event, say }) => {
-  // only react to a certain emoji. :frowning: for example
+  // * only react to a certain emoji. :frowning: for example
   if (event.reaction === 'frowning') {
-    // const channelId = event.item.channel;
-    // const ts = event.item.ts;
+    // * const channelId = event.item.channel;
+    // * const ts = event.item.ts;
     const message_blocks = [
       {
         type: 'section',
@@ -487,7 +473,6 @@ app.event('reaction_added', async ({ context, event, say }) => {
     //   text: 'This is a plain text section block.',
     //   blocks: message_blocks,
     // })
-    // Respond to the message with a button
   }
 })
 
