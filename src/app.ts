@@ -22,30 +22,25 @@ app.action('escalate_button', async ({ ack, action, context }) => {
   ack()
 
   const buttonAction: ButtonAction = action as ButtonAction
-
+  type permalink = { permalink: string }
   const actionData = JSON.parse(buttonAction.value)
+  const { getPermalink, postMessage } = app.client.chat
 
   // * Call the chat.getPermalink method with a token
-  let result: any
+  let permalink
+  // * say() method only posts a message to the same channel, so you need to call the method
   try {
-    result = await app.client.chat.getPermalink({
+    permalink = await getPermalink({
       // * The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
       channel: actionData.channel,
       message_ts: actionData.ts,
     })
-  } catch (error) {
-    errorDescription(error)
-  }
-
-  // * say() method only posts a message to the same channel, so you need to call the method
-  try {
-    result
-    await app.client.chat.postMessage({
+    await postMessage({
       // * The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
       channel: 'REPLACE_WITH_SLACK_CHANNEL',
-      text: `<@${actionData.user}> has excalated an issue \n ${result.permalink}`,
+      text: `<@${actionData.user}> has excalated an issue \n ${permalink.permalink}`,
       unfurl_links: true,
     })
   } catch (error) {
