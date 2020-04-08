@@ -58,7 +58,7 @@ export interface UsersInfoResponse {
   provided?: string
 }
 
-export interface User {
+interface User {
   id?: string
   team_id?: string
   name?: string

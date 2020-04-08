@@ -66,6 +66,6 @@
     /* Experimental Options */
     "pretty": true /* Stylize errors and messages using color and context (experimental). */
   },
-  "include": ["./src/*.ts", "./src/boneyard/*.ts", "tsconfig.json"],
+  "include": ["./src/*.ts", "./src/boneyard/*.ts"],
   "exclude": ["node_modules"]
 }

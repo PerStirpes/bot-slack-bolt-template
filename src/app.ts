@@ -291,11 +291,13 @@ app.event('member_joined_channel', async ({ event, say }) => {
 
   // * check if our Bot user itself is joining the channel
   if (user === getMe() && channel) {
-    const message = copy(messages.welcome_channel)
+    const message: any = copy(messages.welcome_channel)
     // * fill in placeholder values with channel info
-    message.blocks[0].text.text = message.blocks[0].text.text
-      .replace('{{channelName}}', channel.name)
-      .replace('{{channelId}}', channel.id)
+    if (!message.blocks[0]) {
+      message.blocks[0].text.text = message.blocks[0].text.text
+        .replace('{{channelName}}', channel.name)
+        .replace('{{channelId}}', channel.id)
+    }
     say(message)
   }
 })
