@@ -3,7 +3,7 @@ on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Run shame shame
+    name: Run Shame
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
