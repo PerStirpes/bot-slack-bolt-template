@@ -41,7 +41,7 @@ app.action('escalate_button', async ({ ack, action, context }) => {
   // * say() method only posts a message to the same channel, so you need to call the method
   try {
     result
-    const post = await app.client.chat.postMessage({
+    await app.client.chat.postMessage({
       // * The token you used to initialize your app is stored in the `context` object
       token: context.botToken,
       channel: 'REPLACE_WITH_SLACK_CHANNEL',
@@ -103,13 +103,13 @@ app.action('incident_ack', async ({ body, ack, say, context }) => {
 
 app.message('happy', async ({ message, context }) => {
   try {
-    const result = await app.client.reactions.add({
+    await app.client.reactions.add({
       token: context.botToken,
       name: 'grinning',
       channel: message.channel,
       timestamp: message.ts,
     })
-    const response = await app.client.reactions.add({
+    await app.client.reactions.add({
       token: context.botToken,
       name: 'star',
       channel: message.channel,
@@ -179,8 +179,8 @@ app.message('sleep it off', directMention(), async ({ context, say }) => {
   }
 })
 
-app.message('game', async ({ message, say }) => {
-  const { channel, ts, user } = message
+app.message('game', async ({ say }) => {
+  // const { channel, ts, user } = message save for later
 
   const message_blocks = [
     {
@@ -321,7 +321,7 @@ app.event('reaction_added', async ({ event, context }) => {
       user: event.user,
     })
 
-    const name = '<@' + user.user.id + '>'
+    const name = `<@${user.user.id}>`
     const channelGot = getChannel()
 
     // * post this message to the configured channel
@@ -336,11 +336,18 @@ app.event('reaction_added', async ({ event, context }) => {
   }
 })
 
-app.event('reaction_added', async ({ event }) => {
+app.event('reaction_added', async ({ context, event }) => {
   // * only react to a certain emoji. :frowning: for example
   if (event.reaction === 'frowning') {
     // * const channelId = event.item.channel;
     // * const ts = event.item.ts;
+    const channelGot = getChannel()
+    const user: any = await app.client.users.info({
+      token: context.botToken,
+      user: event.user,
+    })
+
+    const name = `<@${user.user.id}>`
     const message_blocks = [
       {
         type: 'section',
@@ -351,6 +358,15 @@ app.event('reaction_added', async ({ event }) => {
         },
       },
     ]
+
+    await app.client.chat.postMessage({
+      token: context.botToken,
+      channel: channelGot && channelGot.id,
+      text: name + ' wants you to see this message: ',
+      blocks: message_blocks,
+      unfurl_links: true,
+      unfurl_media: true,
+    })
     // say({
     //   text: 'This is a plain text section block.',
     //   blocks: message_blocks,
@@ -389,7 +405,7 @@ process.on('uncaughtException', function (err) {
   process.exit(1)
 })
 
-process.on('unhandledRejection', function (reason, p) {
+process.on('unhandledRejection', function (reason) {
   console.error('Unhandled rejection', reason)
 })
 

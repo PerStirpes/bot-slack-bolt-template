@@ -6,7 +6,7 @@ type SlackError = {
   original: Error
   statusCode?: number
   statusMessage?: string
-  body?: any
+  body?: {} | any
   headers?: IncomingHttpHeaders
   retryAfter?: number
   data?: object & {

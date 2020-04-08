@@ -1,26 +1,26 @@
-interface UserType {
-  user: string;
-}
+// interface UserType {
+//   user: string;
+// }
 // This is not a real datastore, but it can be if you make it one :)
-interface Users {
-  id: string;
-  user: UserType;
-}
+// interface Users {
+//   id: string;
+//   user: UserType;
+// }
 
 interface Channel {
-  name: string;
-  id: string;
-  user: string;
+  name: string
+  id: string
+  user: string
 }
 
-const messages = {};
-let users: Users;
-let me: string;
-let defaultChannel: Channel;
+const messages = {}
+// let users: Users;
+let me: string
+let defaultChannel: Channel
 
 const getMessages = () => {
-  return messages;
-};
+  return messages
+}
 
 // const addUser = (user: Users) => {
 //   users[user.user] = user;
@@ -31,19 +31,19 @@ const getMessages = () => {
 // };
 
 const setChannel = (channel: Channel) => {
-  defaultChannel = channel;
-};
+  defaultChannel = channel
+}
 
 const getChannel = () => {
-  return defaultChannel;
-};
+  return defaultChannel
+}
 
 const setMe = (id: string) => {
-  me = id;
-};
+  me = id
+}
 
 const getMe = () => {
-  return me;
-};
+  return me
+}
 // addUser,getUser,
-export { getMessages, getChannel, getMe, setChannel, setMe };
+export { getMessages, getChannel, getMe, setChannel, setMe }
