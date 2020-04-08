@@ -3,14 +3,14 @@ on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Run eslint
+    name: Run shame shame
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: '13.x'
       - run: yarn
-      - run: yarn lint
+      - run: yarn shame
   tsc:
     runs-on: ubuntu-latest
     name: Check typescript
